@@ -16,7 +16,8 @@ def parse_import_statements(content, filepath):
     try:
         tree = ast.parse(content)
     except Exception as inst:
-        raise('cannot parse', filepath, inst)
+        print("cannot parse", filepath, inst)
+        raise inst
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for subnode in node.names:
