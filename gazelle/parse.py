@@ -13,7 +13,10 @@ from tokenize import COMMENT, tokenize
 
 def parse_import_statements(content, filepath):
     modules = list()
-    tree = ast.parse(content)
+    try:
+        tree = ast.parse(content)
+    except Exception as inst:
+        raise('cannot parse', filepath, inst)
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for subnode in node.names:
