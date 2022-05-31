@@ -54,6 +54,37 @@ http_archive(
 )
 ```
 
+### Toolchain registration
+
+To register a hermetic Python toolchain rather than rely on a system-installed interpreter for runtime execution, you can add to the `WORKSPACE` file:
+
+```python
+load("@rules_python//python:repositories.bzl", "python_register_toolchains")
+
+python_register_toolchains(
+    name = "python3_9",
+    # Available versions are listed in @rules_python//python:versions.bzl.
+    # We recommend using the same version your team is already standardized on.
+    python_version = "3.9",
+)
+
+load("@python3_9//:defs.bzl", "interpreter")
+
+load("@rules_python//python:pip.bzl", "pip_parse")
+
+pip_parse(
+    ...
+    python_interpreter_target = interpreter,
+    ...
+)
+```
+
+After registration, your Python targets will use the toolchain's interpreter during execution, but a system-installed interpreter
+is still used to 'bootstrap' Python targets (see https://github.com/bazelbuild/rules_python/issues/691).
+You may also find some quirks while using this toolchain. Please refer to [python-build-standalone documentation's _Quirks_ section](https://python-build-standalone.readthedocs.io/en/latest/quirks.html) for details.
+
+### "Hello World"
+
 Once you've imported the rule set into your `WORKSPACE` using any of these
 methods, you can then load the core rules in your `BUILD` files with:
 
@@ -109,8 +140,8 @@ one another, and may result in downloading the same wheels multiple times.
 
 As with any repository rule, if you would like to ensure that `pip_install` is
 re-executed in order to pick up a non-hermetic change to your environment (e.g.,
-updating your system `python` interpreter), you can completely flush out your
-repo cache with `bazel clean --expunge`.
+updating your system `python` interpreter), you can force it to re-execute by running
+`bazel sync --only [pip_install name]`.
 
 ### Fetch `pip` dependencies lazily
 
