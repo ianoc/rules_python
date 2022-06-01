@@ -142,7 +142,7 @@ def generate_build_file_contents(
         # RECORD is known to contain sha256 checksums of files which might include the checksums
         # of generated files produced when wheels are installed. The file is ignored to avoid
         # Bazel caching issues.
-        "**/*.dist-info/RECORD",
+        # "**/*.dist-info/RECORD",
     ]
 
     data_exclude = list(
